@@ -1,8 +1,28 @@
 spring:
   main:
     web-application-type: REACTIVE
+  profiles:
+    active: dev
   application:
     name: gateway-service-bank
   cloud:
     config:
       uri: http://localhost:8762
+    gateway:
+      discovery:
+        enabled: true
+        locator:
+          enabled: true
+      routes:
+        - id: customer-service-bank
+          uri: lb://customer-service-bank
+          predicates:
+            - Path=/customer/**
+          filters:
+            - RewritePath=/customer/(?<segment>.*), /$\{segment}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
